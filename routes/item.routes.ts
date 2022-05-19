@@ -24,13 +24,11 @@ router.get('/search', async (req: Request, res: Response) => {
 router.get('/like/:itemId', async (req: Request, res: Response) => {
     const { itemId } = req.params
     try {
-        if (itemId && req.session.user?._id) {
-            const result = await item.likeItem(itemId, req.session.user?._id)
-            res.status(200).json(result)
+        if (!itemId || !req.session.user?._id) {
+            return res.status(401).send('User is not logged in')
         }
-        else {
-            res.status(401).send('User is not logged in')
-        }
+        const result = await item.likeItem(itemId, req.session.user?._id)
+        res.status(200).json(result)
     }
     catch (error) {
         console.error(error)
@@ -46,13 +44,19 @@ router.get('/find/:itemId', async (req: Request, res: Response) => {
     if (itemData.length)
         return res.status(200).json({ item: itemData, like: !like, comments: comments })
     else
-        return res.status(200).json({ item: [], like: undefined, comments: undefined })
+        return res.status(200).json({ item: [], like: false, comments: [] })
 })
 
 router.post('/comments/:itemId', async (req: Request, res: Response) => {
     const { itemId } = req.params
     const { message } = req.body.data
     try {
+        if (!itemId || !req.session.user?._id) {
+            return res.status(401).send('User is not authorized')
+        }
+        if (!message) {
+            return res.status(400).send('Message is empty')
+        }
         const result = await item.commentItem(itemId, req.session.user?._id, message)
         res.status(200).json(result)
     }
@@ -84,7 +88,7 @@ router.post('/comment/:itemId', async (req: Request, res: Response) => {
 
 router.put('/edit/:itemId', async (req: Request, res: Response) => {
     const { itemId } = req.params
-    if (!(req.session.user?._id === req.session.lastSearchedUser?._id.valueOf() || req.session.user?.privilage === "admin" || req.session.user?.privilage === "owner")) {
+    if (!(req.session.user?._id === req.session.lastSearchedUser?._id || req.session.user?.privilage === "admin" || req.session.user?.privilage === "owner")) {
         return res.status(401).send('User is not authorized')
     }
     try {
@@ -98,7 +102,7 @@ router.put('/edit/:itemId', async (req: Request, res: Response) => {
 
 router.delete('/delete/:itemId', async (req: Request, res: Response) => {
     const { itemId } = req.params
-    if (!(req.session.user?._id === req.session.lastSearchedUser?._id.valueOf() || req.session.user?.privilage === "admin" || req.session.user?.privilage === "owner")) {
+    if (!(req.session.user?._id === req.session.lastSearchedUser?._id || req.session.user?.privilage === "admin" || req.session.user?.privilage === "owner")) {
         return res.status(401).send('User is not authorized')
     }
     try {
