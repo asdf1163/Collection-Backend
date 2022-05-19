@@ -1,0 +1,177 @@
+import { Types } from 'mongoose'
+import { Iitem } from "../../frontend/src/interfaces/collections.interfaces";
+import ItemModel from '../models/ItemSchema'
+
+
+const constructItem = ({ name, collectionId, tags, additional, ownerId, linkImg }: Iitem) => {
+    return new ItemModel({
+        name: name,
+        collectionId: new Types.ObjectId(collectionId),
+        tags: tags,
+        additional: additional,
+        ownerId: ownerId,
+        linkImg: linkImg
+    })
+}
+
+const searchItem = async (searchQuery: string) => {
+    return await ItemModel.find({ $text: { $search: searchQuery } }, { score: { $meta: "textScore" } }).sort({ score: { $meta: "textScore" } }).limit(10)
+}
+
+const findItem = async (itemId: string) => {
+    return await ItemModel.aggregate([{
+        $lookup: {
+            from: 'users',
+            localField: 'ownerId',
+            foreignField: '_id',
+            pipeline: [
+                {
+                    $project: {
+                        _id: '$_id',
+                        username: '$username'
+                    }
+                }
+            ],
+            as: 'owner'
+        }
+    }, {
+        $match: {
+            _id: new Types.ObjectId(itemId)
+        }
+    }, {
+        $unwind: {
+            path: '$owner'
+        }
+    }])
+}
+
+
+const findLatestItems = async () => {
+    return await ItemModel.aggregate([{
+        $lookup: {
+            from: 'collections',
+            localField: 'collectionId',
+            foreignField: '_id',
+            as: 'collection'
+        }
+    }, {
+        $unwind: {
+            path: '$collection',
+            preserveNullAndEmptyArrays: true
+        }
+    }, {
+        $lookup: {
+            from: 'users',
+            localField: 'collection.idUser',
+            foreignField: '_id',
+            as: 'user'
+        }
+    }, {
+        $unwind: {
+            path: '$user',
+            preserveNullAndEmptyArrays: true
+        }
+    }, {
+        $sort: {
+            creationDate: -1
+        }
+    },
+    {
+        $limit: 10
+    }])
+}
+
+const addItem = async (data: Iitem) => {
+    try {
+        const item = constructItem(data)
+        return await item.save()
+    }
+    catch (error) {
+        throw error
+    }
+}
+
+const userLikedItem = async (itemId: string, userId: string) => {
+    const result = await ItemModel.findOne({ _id: new Types.ObjectId(itemId), likes: new Types.ObjectId(userId) })
+    return result === null
+}
+
+const likeItem = async (itemId: string, userId: string) => {
+    try {
+        if (await userLikedItem(itemId, userId)) {
+            return await ItemModel.updateOne({ _id: new Types.ObjectId(itemId) }, { $addToSet: { likes: new Types.ObjectId(userId) } })
+        } else {
+            return await ItemModel.updateOne({ _id: new Types.ObjectId(itemId) }, { $pull: { likes: new Types.ObjectId(userId) } })
+        }
+    } catch (error) {
+        throw error
+    }
+}
+
+const commentItem = async (itemId: string, userId: string, message: string) => {
+    return await ItemModel.updateOne({ _id: itemId },
+        {
+            $addToSet: {
+                comments:
+                {
+                    userId: new Types.ObjectId(userId),
+                    message: message,
+                }
+            }
+        })
+}
+
+const loadItemComments = async (itemId: string) => {
+    return await ItemModel.aggregate([
+        {
+            $match: {
+                _id: new Types.ObjectId(itemId)
+            }
+        }, {
+            $lookup: {
+                from: 'users',
+                'let': {
+                    id: '$users._id',
+                    message: '$comments.message'
+                },
+                pipeline: [
+                    {
+                        $match: {
+                            $expr: {
+                                $eq: [
+                                    '$comments.userId',
+                                    '$$id'
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        $project: {
+                            username: 1,
+                            comments: 1
+                        }
+                    }
+                ],
+                localField: 'comments.userId',
+                foreignField: '_id',
+                as: 'users'
+            }
+        }, {
+            $project: {
+                comments: 1,
+                users: 1
+            }
+        }]
+    )
+}
+
+const updateItem = async (itemId: string, data: Iitem) => {
+    return await ItemModel.updateOne({ _id: itemId }, { $set: data })
+}
+
+const deleteItem = async (itemId: string) => {
+    return await ItemModel.deleteOne({ _id: new Types.ObjectId(itemId) })
+}
+
+export default { constructItem, findItem, addItem, updateItem, deleteItem, findLatestItems, likeItem, commentItem, userLikedItem, loadItemComments, searchItem }
+
