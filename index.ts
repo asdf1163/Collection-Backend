@@ -13,9 +13,9 @@ const app = express()
 const PORT = process.env.PORT || 5000
 const MONGO_URI = process.env.DATABASE_URL
 
-const allowedOrigins = ["http://localhost:3000", "https://project-collection001.herokuapp.com"];
+// const allowedOrigins = ["http://localhost:3000", "https://project-collection001.herokuapp.com", "*"];
 const options: cors.CorsOptions = {
-    origin: allowedOrigins,
+    origin: "*",
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true
 }
@@ -43,7 +43,7 @@ app.use(session({
     saveUninitialized: true,
     cookie: {
         secure: true,
-        httpOnly: false,
+        // httpOnly: false,
         maxAge: timeout.experssSession()
     }
 }))
