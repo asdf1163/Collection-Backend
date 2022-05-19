@@ -77,13 +77,13 @@ app.use(function (req, res, next) {
     next()
 })
 
-app.use('/api/collection', collection)
-app.use('/api/item', item)
-app.use('/api/user', user)
-
 app.get('/', (req: Request, res: Response) => {
     res.send("Hello")
 })
+
+app.use('/api/collection', collection)
+app.use('/api/item', item)
+app.use('/api/user', user)
 
 app.listen(PORT, () => {
     try {
