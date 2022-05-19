@@ -18,30 +18,33 @@ const searchItem = async (searchQuery: string) => {
 }
 
 const findItem = async (itemId: string) => {
-    return await ItemModel.aggregate([{
-        $lookup: {
-            from: 'users',
-            localField: 'ownerId',
-            foreignField: '_id',
-            pipeline: [
-                {
-                    $project: {
-                        _id: '$_id',
-                        username: '$username'
+    if (itemId.match(/^[0-9a-fA-F]{24}$/)) {
+        return await ItemModel.aggregate([{
+            $lookup: {
+                from: 'users',
+                localField: 'ownerId',
+                foreignField: '_id',
+                pipeline: [
+                    {
+                        $project: {
+                            _id: '$_id',
+                            username: '$username'
+                        }
                     }
-                }
-            ],
-            as: 'owner'
-        }
-    }, {
-        $match: {
-            _id: new Types.ObjectId(itemId)
-        }
-    }, {
-        $unwind: {
-            path: '$owner'
-        }
-    }])
+                ],
+                as: 'owner'
+            }
+        }, {
+            $match: {
+                _id: new Types.ObjectId(itemId)
+            }
+        }, {
+            $unwind: {
+                path: '$owner'
+            }
+        }])
+    }
+    else return []
 }
 
 const findLatestItems = async () => {
@@ -120,47 +123,49 @@ const commentItem = async (itemId: string, userId: string, message: string) => {
 }
 
 const loadItemComments = async (itemId: string) => {
-    return await ItemModel.aggregate([
-        {
-            $match: {
-                _id: new Types.ObjectId(itemId)
-            }
-        }, {
-            $lookup: {
-                from: 'users',
-                'let': {
-                    id: '$users._id',
-                    message: '$comments.message'
-                },
-                pipeline: [
-                    {
-                        $match: {
-                            $expr: {
-                                $eq: [
-                                    '$comments.userId',
-                                    '$$id'
-                                ]
+    if (itemId.match(/^[0-9a-fA-F]{24}$/)) {
+        return await ItemModel.aggregate([
+            {
+                $match: {
+                    _id: new Types.ObjectId(itemId)
+                }
+            }, {
+                $lookup: {
+                    from: 'users',
+                    'let': {
+                        id: '$users._id',
+                        message: '$comments.message'
+                    },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $eq: [
+                                        '$comments.userId',
+                                        '$$id'
+                                    ]
+                                }
+                            }
+                        },
+                        {
+                            $project: {
+                                username: 1,
+                                comments: 1
                             }
                         }
-                    },
-                    {
-                        $project: {
-                            username: 1,
-                            comments: 1
-                        }
-                    }
-                ],
-                localField: 'comments.userId',
-                foreignField: '_id',
-                as: 'users'
-            }
-        }, {
-            $project: {
-                comments: 1,
-                users: 1
-            }
-        }]
-    )
+                    ],
+                    localField: 'comments.userId',
+                    foreignField: '_id',
+                    as: 'users'
+                }
+            }, {
+                $project: {
+                    comments: 1,
+                    users: 1
+                }
+            }]
+        )
+    } else return []
 }
 
 const updateItem = async (itemId: string, data: Iitem) => {
