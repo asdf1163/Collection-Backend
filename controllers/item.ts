@@ -92,12 +92,15 @@ const addItem = async (data: Iitem) => {
     }
 }
 
-const userLikedItem = async (itemId: string, userId: string) => {
-    const result = await ItemModel.findOne({ _id: new Types.ObjectId(itemId), likes: new Types.ObjectId(userId) })
-    return result === null
+const userLikedItem = async (itemId: any, userId: any) => {
+    if (itemId && userId) {
+        const result = await ItemModel.findOne({ _id: new Types.ObjectId(itemId), likes: new Types.ObjectId(userId) })
+        return result === null
+    }
+    else return []
 }
 
-const likeItem = async (itemId: string, userId: string) => {
+const likeItem = async (itemId: any, userId: any) => {
     try {
         if (await userLikedItem(itemId, userId)) {
             return await ItemModel.updateOne({ _id: new Types.ObjectId(itemId) }, { $addToSet: { likes: new Types.ObjectId(userId) } })

@@ -24,8 +24,13 @@ router.get('/search', async (req: Request, res: Response) => {
 router.get('/like/:itemId', async (req: Request, res: Response) => {
     const { itemId } = req.params
     try {
-        const result = await item.likeItem(itemId, req.session.user?._id)
-        res.status(200).json(result)
+        if (itemId && req.session.user?._id) {
+            const result = await item.likeItem(itemId, req.session.user?._id)
+            res.status(200).json(result)
+        }
+        else {
+            res.status(401).send('User is not logged in')
+        }
     }
     catch (error) {
         console.error(error)

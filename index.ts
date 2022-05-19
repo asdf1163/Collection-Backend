@@ -33,7 +33,7 @@ const timeout = {
 }
 
 var sessionStore = MongoStore.create({
-    mongoUrl: process.env.DATABASE_URL,
+    mongoUrl: MONGO_URI,
     collectionName: 'sessions',
     ttl: timeout.mongoDb(),
 }) as Store
@@ -45,8 +45,8 @@ app.use(session({
     resave: false,
     saveUninitialized: true,
     cookie: {
-        secure: false,
-        // httpOnly: false,
+        secure: true,
+        httpOnly: false,
         maxAge: timeout.experssSession()
     }
 }))
@@ -80,8 +80,9 @@ app.use(function (req, res, next) {
     next()
 })
 
-app.get('/', (req: Request, res: Response) => {
+app.get('/', (req: Request, res: Response, next) => {
     res.send("Hello")
+    next();
 })
 
 app.use('/api/collection', collection)
