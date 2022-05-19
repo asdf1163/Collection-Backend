@@ -13,15 +13,15 @@ const app = express()
 const PORT = process.env.PORT || 5000
 const MONGO_URI = process.env.DATABASE_URL
 
-const allowedOrigins = ["http://localhost:3000", "https://project-collection001.herokuapp.com/"];
+const allowedOrigins = ["http://localhost:3000", "https://project-collection001.herokuapp.com"];
 const options: cors.CorsOptions = {
     origin: allowedOrigins,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true
 }
 app.use(cors(options))
-app.use(express.urlencoded({ limit: '5mb' }))
-app.use(express.json({ limit: '5mb', }))
+app.use(express.urlencoded({ extended: true }))
+app.use(express.json())
 
 const timeout = {
     sessionHours: 24,
@@ -30,7 +30,7 @@ const timeout = {
 }
 
 var sessionStore = MongoStore.create({
-    mongoUrl: MONGO_URI,
+    mongoUrl: process.env.DATABASE_URL,
     collectionName: 'sessions',
     ttl: timeout.mongoDb(),
 }) as Store
