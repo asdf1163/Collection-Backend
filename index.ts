@@ -37,10 +37,10 @@ var sessionStore = MongoStore.create({
 
 
 app.use(session({
+    store: sessionStore,
     secret: 'This is my secret',
     resave: false,
     saveUninitialized: true,
-    store: sessionStore,
     cookie: {
         secure: true,
         httpOnly: false,
