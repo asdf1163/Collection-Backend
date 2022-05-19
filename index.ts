@@ -10,15 +10,28 @@ import { IuserSchema } from './interfaces/users.interfaces'
 import 'dotenv/config'
 
 const app = express()
+
+
+app.use(function (req, res, next) {
+    //Enabling CORS
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, x - client - key, x - client - token, x - client - secret, Authorization");
+    next();
+});
+
 const PORT = process.env.PORT || 5000
 const MONGO_URI = process.env.DATABASE_URL
 
-const allowedOrigins = ["http://localhost:3000", "https://project-collection001.herokuapp.com", "https://cheery-biscuit-41d74b.netlify.app", "*"];
+const allowedOrigins = ["http://localhost:3000", "https://project-collection001.herokuapp.com", "https://cheery-biscuit-41d74b.netlify.app"];
 const options: cors.CorsOptions = {
     origin: allowedOrigins,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    credentials: true
+    credentials: true,
+    preflightContinue: true,
+    optionsSuccessStatus: 200
 }
+
 app.use(cors(options))
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
@@ -42,7 +55,7 @@ app.use(session({
     resave: false,
     saveUninitialized: true,
     cookie: {
-        secure: true,
+        secure: false,
         // httpOnly: false,
         maxAge: timeout.experssSession()
     }
