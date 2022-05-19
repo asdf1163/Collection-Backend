@@ -1,7 +1,6 @@
 import { Types } from 'mongoose'
-
-import { Icollection } from "../../frontend/src/interfaces/collections.interfaces";
 import CollectionModel from '../models/CollectionSchema'
+import { Icollection } from "../interfaces/collections.interfaces";
 
 const constructCollection = ({ idUser, name, description, topic, tags, additional, linkImg }: Icollection) => {
     return new CollectionModel({

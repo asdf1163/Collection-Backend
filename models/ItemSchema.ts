@@ -1,5 +1,6 @@
 import { Schema, model } from 'mongoose';
-import { Iitem } from '../../frontend/src/interfaces/collections.interfaces';
+import { Iitem } from '../interfaces/collections.interfaces';
+
 
 export const itemSchema = new Schema<Iitem>({
     _id: { type: Schema.Types.ObjectId, auto: true },

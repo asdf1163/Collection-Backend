@@ -1,12 +1,12 @@
 import express from 'express'
 import { connect } from 'mongoose'
 import cors from 'cors'
-import collection from './routes/collection.routes'
-import item from './routes/item.routes'
 import user from './routes/user.routes'
+import item from './routes/item.routes'
+import collection from './routes/collection.routes'
 import session, { Store } from 'express-session'
 import MongoStore from 'connect-mongo'
-import { IuserSchema } from '../frontend/src/interfaces/users.interfaces'
+import { IuserSchema } from './interfaces/users.interfaces'
 import 'dotenv/config'
 
 const app = express()

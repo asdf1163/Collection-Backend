@@ -1,7 +1,6 @@
 import { Types } from 'mongoose'
-import { Iitem } from "../../frontend/src/interfaces/collections.interfaces";
+import { Iitem } from "../interfaces/collections.interfaces";
 import ItemModel from '../models/ItemSchema'
-
 
 const constructItem = ({ name, collectionId, tags, additional, ownerId, linkImg }: Iitem) => {
     return new ItemModel({
@@ -44,7 +43,6 @@ const findItem = async (itemId: string) => {
         }
     }])
 }
-
 
 const findLatestItems = async () => {
     return await ItemModel.aggregate([{

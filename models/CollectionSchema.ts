@@ -1,6 +1,6 @@
 
 import { Schema, model } from 'mongoose';
-import { Icollection } from '../../frontend/src/interfaces/collections.interfaces';
+import { Icollection } from '../interfaces/collections.interfaces';
 
 const collectionSchema = new Schema<Icollection>({
     _id: { type: Schema.Types.ObjectId, auto: true },

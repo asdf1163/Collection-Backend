@@ -1,14 +1,12 @@
 import { Types } from 'mongoose'
-
-import { IuserSchema } from "../../frontend/src/interfaces/users.interfaces";
 import UserModel from "../models/UserSchema";
+import { IuserSchema } from "../interfaces/users.interfaces";
 
 const userCreator = ({ username, password, email }: { username: string, password: string, email: string }) => new UserModel({
     username,
     password,
     email
 })
-
 
 const findUserSingup = async ({ username, email }: { username: string, email: string }) => {
     try {

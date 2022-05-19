@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose'
-import { IuserSchema } from '../../frontend/src/interfaces/users.interfaces';
+import { IuserSchema } from '../interfaces/users.interfaces';
 
 const userSchema = new Schema<IuserSchema>({
     _id: { type: Schema.Types.ObjectId, auto: true },
