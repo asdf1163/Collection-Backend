@@ -1,4 +1,4 @@
-import express from 'express'
+import express, { Request, Response } from 'express'
 import { connect } from 'mongoose'
 import cors from 'cors'
 import user from './routes/user.routes'
@@ -80,6 +80,10 @@ app.use(function (req, res, next) {
 app.use('/api/collection', collection)
 app.use('/api/item', item)
 app.use('/api/user', user)
+
+app.get('/', (req: Request, res: Response) => {
+    res.send("Hello")
+})
 
 app.listen(PORT, () => {
     try {
