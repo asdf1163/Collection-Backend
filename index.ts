@@ -14,12 +14,12 @@ const app = express()
 const PORT = process.env.PORT || 5000
 const MONGO_URI = process.env.DATABASE_URL
 
-const allowedOrigins = ["http://localhost:3000", "https://project-collection001.herokuapp.com", "https://cheery-biscuit-41d74b.netlify.app"];
+const allowedOrigins = ["http://localhost:3000", "https://project-collection001.herokuapp.com", "https://cheery-biscuit-41d74b.netlify.app/*"];
 const options: cors.CorsOptions = {
     origin: allowedOrigins,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true,
-    // preflightContinue: true,
+    preflightContinue: true,
     optionsSuccessStatus: 200
 }
 
