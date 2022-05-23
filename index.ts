@@ -46,7 +46,7 @@ app.use(session({
     resave: false,
     saveUninitialized: true,
     cookie: {
-        secure: false,
+        secure: true,
         httpOnly: false,
         maxAge: timeout.experssSession()
     }
@@ -75,7 +75,7 @@ app.use(function (req, res, next) {
             username: '',
             email: '',
             status: 'unlocked',
-            privilage: 'owner'
+            privilage: 'guest'
         }
     }
     next()
