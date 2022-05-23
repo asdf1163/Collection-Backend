@@ -19,7 +19,7 @@ const options: cors.CorsOptions = {
     origin: allowedOrigins,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true,
-    preflightContinue: true,
+    // preflightContinue: true,
     optionsSuccessStatus: 200
 }
 
@@ -47,8 +47,8 @@ app.use(session({
     resave: true,
     saveUninitialized: false,
     cookie: {
-        secure: true,
-        // httpOnly: false,
+        secure: 'auto',
+        httpOnly: false,
         maxAge: timeout.experssSession()
     }
 }))

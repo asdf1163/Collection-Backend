@@ -20,7 +20,7 @@ route.get('/users', async (req: Request, res: Response) => {
 
 route.get('/users/:username', async (req: Request, res: Response) => {
     const { username } = req.params
-
+    console.log(req.sessionID)
     const result = await user.userExist({ username: username })
     if (result === null) {
         res.status(404).send("User Not Exist")
