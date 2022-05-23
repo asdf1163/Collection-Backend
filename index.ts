@@ -13,6 +13,7 @@ import 'dotenv/config'
 const app = express()
 const PORT = process.env.PORT || 5000
 const MONGO_URI = process.env.DATABASE_URL
+app.set('trust proxy', 1);
 
 const allowedOrigins = ["http://localhost:3000", "https://project-collection001.herokuapp.com", "https://cheery-biscuit-41d74b.netlify.app"];
 const options: cors.CorsOptions = {
@@ -47,10 +48,10 @@ app.use(session({
     saveUninitialized: true,
     cookie: {
         secure: true,
-        sameSite: 'lax',
-        httpOnly: true,
+        sameSite: 'none',
+        // httpOnly: true,
         maxAge: timeout.experssSession()
-    } as { secure: boolean },
+    },
 }))
 
 declare module 'express-session' {
