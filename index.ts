@@ -14,7 +14,7 @@ const app = express()
 const PORT = process.env.PORT || 5000
 const MONGO_URI = process.env.DATABASE_URL
 
-const allowedOrigins = ["http://localhost:3000", "https://project-collection001.herokuapp.com", "https://cheery-biscuit-41d74b.netlify.app/*"];
+const allowedOrigins = ["http://localhost:3000", "https://project-collection001.herokuapp.com", "https://cheery-biscuit-41d74b.netlify.app"];
 const options: cors.CorsOptions = {
     origin: allowedOrigins,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
@@ -43,13 +43,14 @@ var sessionStore = MongoStore.create({
 app.use(session({
     store: sessionStore,
     secret: 'This is my secret',
-    resave: true,
+    resave: false,
     saveUninitialized: true,
     cookie: {
-        secure: false,
-        httpOnly: false,
+        secure: true,
+        sameSite: 'lax',
+        httpOnly: true,
         maxAge: timeout.experssSession()
-    }
+    } as { secure: boolean },
 }))
 
 declare module 'express-session' {
