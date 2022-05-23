@@ -44,10 +44,10 @@ app.use(session({
     store: sessionStore,
     secret: 'This is my secret',
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     cookie: {
-        secure: true,
-        httpOnly: false,
+        secure: 'auto',
+        // httpOnly: false,
         maxAge: timeout.experssSession()
     }
 }))
