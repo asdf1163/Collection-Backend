@@ -18,8 +18,8 @@ router.get('/find/:userId', async (req: Request, res: Response) => {
     return res.status(200).json(result)
 })
 
-router.post('/findItemsInCollection', async (req: Request, res: Response) => {
-    const [result] = await collection.findItemsInCollection(req.body.data.collectionId)
+router.get('/findItemsInCollection/:collectionId', async (req: Request, res: Response) => {
+    const [result] = await collection.findItemsInCollection(req.params.collectionId)
     const items = result.items
     delete result.items
     const collectionData = result
