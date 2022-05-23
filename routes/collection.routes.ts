@@ -19,8 +19,11 @@ router.get('/find/:userId', async (req: Request, res: Response) => {
 })
 
 router.post('/findItemsInCollection', async (req: Request, res: Response) => {
-    const result = await collection.findItemsInCollection(req.body.data.collectionId)
-    res.status(200).json(result);
+    const [result] = await collection.findItemsInCollection(req.body.data.collectionId)
+    const items = result.items
+    delete result.items
+    const collectionData = result
+    res.status(200).json({ items, collectionData });
 })
 
 
@@ -53,9 +56,10 @@ router.delete('/delete/:collectionId', async (req: Request, res: Response) => {
     }
 })
 
-router.post('/create', async (req: Request, res: Response) => {
+router.post('/create', async function (req: Request, res: Response) {
     if (!(req.session.user?._id === req.session.lastSearchedUser?._id || req.session.user?.privilage === "admin" || req.session.user?.privilage === "owner"))
         return res.status(401).send('User is not authorized')
+    Object.assign(req.body.data, { idUser: req.session.lastSearchedUser?._id })
     const result = await collection.createCollection(req.body.data)
     res.status(200).json(result)
 })

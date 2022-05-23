@@ -9,6 +9,7 @@ import MongoStore from 'connect-mongo'
 import { IuserSchema } from './interfaces/users.interfaces'
 import 'dotenv/config'
 
+
 const app = express()
 const PORT = process.env.PORT || 5000
 const MONGO_URI = process.env.DATABASE_URL
@@ -84,6 +85,7 @@ app.get('/', (req: Request, res: Response, next) => {
     res.send("Hello")
     next();
 })
+
 
 app.use('/api/collection', collection)
 app.use('/api/item', item)

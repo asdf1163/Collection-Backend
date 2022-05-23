@@ -14,10 +14,26 @@ const constructItem = ({ name, collectionId, tags, additional, ownerId, linkImg 
 }
 
 const searchItem = async (searchQuery: string) => {
-    return await ItemModel.find({ $text: { $search: searchQuery } }, { score: { $meta: "textScore" } }).sort({ score: { $meta: "textScore" } }).limit(10)
+    return await ItemModel.aggregate([
+        {
+            $search: {
+                index: 'default',
+                text: {
+                    query: searchQuery,
+                    path: {
+                        'wildcard': '*'
+                    }
+                }
+            }
+        }
+    ])
 }
 
-const findItem = async (itemId: string) => {
+const findItem = async (query: any) => {
+    return await ItemModel.find(query)
+}
+
+const findItemById = async (itemId: string) => {
     if (itemId.match(/^[0-9a-fA-F]{24}$/)) {
         return await ItemModel.aggregate([{
             $lookup: {
@@ -125,6 +141,10 @@ const commentItem = async (itemId: string, userId: string, message: string) => {
         })
 }
 
+const distinctField = async (fieldName: string) => {
+    return await ItemModel.distinct(fieldName)
+}
+
 const loadItemComments = async (itemId: string) => {
     if (itemId.match(/^[0-9a-fA-F]{24}$/)) {
         return await ItemModel.aggregate([
@@ -179,5 +199,5 @@ const deleteItem = async (itemId: string) => {
     return await ItemModel.deleteOne({ _id: new Types.ObjectId(itemId) })
 }
 
-export default { constructItem, findItem, addItem, updateItem, deleteItem, findLatestItems, likeItem, commentItem, userLikedItem, loadItemComments, searchItem }
+export default { constructItem, findItemById, addItem, updateItem, deleteItem, findLatestItems, likeItem, commentItem, userLikedItem, loadItemComments, searchItem, distinctField, findItem }
 

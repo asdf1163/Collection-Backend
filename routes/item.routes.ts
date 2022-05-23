@@ -36,9 +36,19 @@ router.get('/like/:itemId', async (req: Request, res: Response) => {
     }
 })
 
+router.get('/tags', async (req: Request, res: Response) => {
+    try {
+        const result = req.query.q ? await item.findItem({ tags: { $in: [req.query.q] } }) : await item.distinctField('tags')
+        res.status(200).json(result)
+    }
+    catch (error) {
+        console.log(error)
+    }
+})
+
 router.get('/find/:itemId', async (req: Request, res: Response) => {
     const { itemId } = req.params
-    const itemData = await item.findItem(itemId)
+    const itemData = await item.findItemById(itemId)
     const like = await item.userLikedItem(itemId, req.session.user?._id)
     const comments = await item.loadItemComments(itemId)
     if (itemData.length)
@@ -47,7 +57,7 @@ router.get('/find/:itemId', async (req: Request, res: Response) => {
         return res.status(200).json({ item: [], like: false, comments: [] })
 })
 
-router.post('/comments/:itemId', async (req: Request, res: Response) => {
+router.post('/comment/:itemId', async (req: Request, res: Response) => {
     const { itemId } = req.params
     const { message } = req.body.data
     try {
@@ -66,24 +76,12 @@ router.post('/comments/:itemId', async (req: Request, res: Response) => {
 })
 
 router.post('/create', async (req: Request, res: Response) => {
-    if (!(req.session.user?._id === req.session.lastSearchedUser?._id.valueOf() || req.session.user?.privilage === "admin" || req.session.user?.privilage === "owner")) {
+    if (!(req.session.user?._id === req.session.lastSearchedUser?._id || req.session.user?.privilage === "admin" || req.session.user?.privilage === "owner")) {
         return res.status(401).send('User is not authorized')
     }
+    Object.assign(req.body.data, { ownerId: req.session.lastSearchedUser?._id })
     const result = await item.addItem(req.body.data)
     res.status(200).json(result)
-})
-
-router.post('/comment/:itemId', async (req: Request, res: Response) => {
-    const { itemId } = req.params
-    const { comment } = req.body.data
-    try {
-        const result = await item.commentItem(itemId, req.session.user?._id, comment)
-        res.status(200).json(result)
-    }
-    catch (error) {
-        res.status(400).send('Something wend wrong during like operation')
-    }
-
 })
 
 router.put('/edit/:itemId', async (req: Request, res: Response) => {
