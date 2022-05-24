@@ -1,6 +1,7 @@
 import { Response, Request, Router } from "express";
 const router = Router();
 import collection from '../controllers/collection'
+import item from "../controllers/item";
 
 router.get('/', function (req: Request, res: Response) {
     res.send('hello');
@@ -13,17 +14,25 @@ router.get('/largestCollection', async (req: Request, res: Response) => {
 
 router.get('/find/:userId', async (req: Request, res: Response) => {
     const { userId } = req.params
-    const result = await collection.findCollection(userId)
-    if (result.length === 0) return res.status(404).send("User doesn't have any collection")
-    return res.status(200).json(result)
+    try {
+        const result = await collection.findCollection(userId)
+        return res.status(200).json(result)
+    } catch (error) {
+        return res.status(500).send(error)
+    }
 })
 
 router.get('/findItemsInCollection/:collectionId', async (req: Request, res: Response) => {
     const [result] = await collection.findItemsInCollection(req.params.collectionId)
-    const items = result.items
-    delete result.items
-    const collectionData = result
-    res.status(200).json({ items, collectionData });
+    if (result) {
+        const items = result.items
+        const users = result.users
+        delete result.items
+        const collectionData = result
+        res.status(200).json({ items, collectionData, users });
+    }
+    else
+        res.status(404).json({ items: [], collectionData: [], users: [] });
 })
 
 
@@ -45,10 +54,10 @@ router.put('/edit/:collectionId', async (req: Request, res: Response, next) => {
 
 router.delete('/delete/:collectionId', async (req: Request, res: Response) => {
     const { collectionId } = req.params
-
     if (!(req.session.user?._id === req.session.lastSearchedUser?._id || req.session.user?.privilage === "admin" || req.session.user?.privilage === "owner"))
         return res.status(401).send('User is not authorized')
     try {
+        await item.deleteManyItems({ collectionId: collectionId })
         await collection.deleteCollection(collectionId)
         res.status(204).send('Collection successfuly deleted')
     } catch (error) {

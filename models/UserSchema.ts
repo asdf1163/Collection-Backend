@@ -8,7 +8,6 @@ const userSchema = new Schema<IuserSchema>({
     email: { type: String, required: true, unique: true, lowercase: true },
     status: { type: String, default: 'unlocked', lowercase: true },
     privilage: { type: String, required: true, lowercase: true, default: 'user' },
-    likes: { type: [Schema.Types.ObjectId], default: [] }
 });
 
 export default model("User", userSchema)

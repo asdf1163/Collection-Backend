@@ -6,7 +6,6 @@ export interface IuserSchema {
     email: string,
     status: 'blocked' | 'unlocked',
     privilage: 'owner' | 'admin' | 'user' | 'guest',
-    likes?: any[]
 }
 
 export interface IuserPost {

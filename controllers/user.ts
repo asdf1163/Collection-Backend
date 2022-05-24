@@ -61,7 +61,7 @@ const likeItem = async (itemId: string, userId: string) => {
     try {
         const ifExist = await UserModel.findOne({ _id: new Types.ObjectId(userId), likes: new Types.ObjectId(itemId) })
         if (ifExist === null) {
-            return await UserModel.updateOne({ _id: new Types.ObjectId(userId) }, { $addToSet: { likes: new Types.ObjectId(itemId) } }, { upsert: true })
+            return await UserModel.updateOne({ _id: new Types.ObjectId(userId) }, { $addToSet: { likes: new Types.ObjectId(itemId) } })
         } else {
             return await UserModel.updateOne({ _id: new Types.ObjectId(userId) }, { $pull: { likes: new Types.ObjectId(itemId) } })
         }

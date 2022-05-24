@@ -25,11 +25,14 @@ const searchItem = async (searchQuery: string) => {
                     }
                 }
             }
+        },
+        {
+            $limit: 10
         }
     ])
 }
 
-const findItem = async (query: any) => {
+const findItem = async (query: object) => {
     return await ItemModel.find(query)
 }
 
@@ -108,7 +111,7 @@ const addItem = async (data: Iitem) => {
     }
 }
 
-const userLikedItem = async (itemId: any, userId: any) => {
+const userLikedItem = async (itemId: string, userId: string) => {
     if (itemId && userId) {
         const result = await ItemModel.findOne({ _id: new Types.ObjectId(itemId), likes: new Types.ObjectId(userId) })
         return result === null
@@ -116,7 +119,7 @@ const userLikedItem = async (itemId: any, userId: any) => {
     else return []
 }
 
-const likeItem = async (itemId: any, userId: any) => {
+const likeItem = async (itemId: string, userId: string) => {
     try {
         if (await userLikedItem(itemId, userId)) {
             return await ItemModel.updateOne({ _id: new Types.ObjectId(itemId) }, { $addToSet: { likes: new Types.ObjectId(userId) } })
@@ -199,5 +202,9 @@ const deleteItem = async (itemId: string) => {
     return await ItemModel.deleteOne({ _id: new Types.ObjectId(itemId) })
 }
 
-export default { constructItem, findItemById, addItem, updateItem, deleteItem, findLatestItems, likeItem, commentItem, userLikedItem, loadItemComments, searchItem, distinctField, findItem }
+const deleteManyItems = async (query: object) => {
+    return await ItemModel.deleteMany(query)
+}
+
+export default { constructItem, findItemById, addItem, updateItem, deleteItem, findLatestItems, likeItem, commentItem, userLikedItem, loadItemComments, searchItem, distinctField, findItem, deleteManyItems}
 

@@ -42,7 +42,7 @@ router.get('/tags', async (req: Request, res: Response) => {
         res.status(200).json(result)
     }
     catch (error) {
-        console.log(error)
+        console.error(error)
     }
 })
 

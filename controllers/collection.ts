@@ -1,6 +1,7 @@
 import { Types } from 'mongoose'
 import CollectionModel from '../models/CollectionSchema'
 import { Icollection } from "../interfaces/collections.interfaces";
+import item from './item';
 
 const constructCollection = ({ idUser, name, description, topic, tags, additional, linkImg }: Icollection) => {
     return new CollectionModel({
@@ -51,14 +52,18 @@ const largestCollection = async () => {
     }])
 }
 
-const findCollection = async (userId: string) => {
+const findCollection = async (userId: string, additionalOption: object = {}) => {
     if (userId.match(/^[0-9a-fA-F]{24}$/))
-        return await CollectionModel.find({ idUser: new Types.ObjectId(userId) });
+        return await CollectionModel.find({ idUser: new Types.ObjectId(userId) }, additionalOption);
     else return []
 }
 
-const findItemsInCollection = async (collectionId: string, itemId = "") => {
+const findItemsInCollection = async (collectionId: string) => {
     return await CollectionModel.aggregate([{
+        $match: {
+            _id: new Types.ObjectId(collectionId)
+        }
+    }, {
         $lookup: {
             from: 'items',
             localField: '_id',
@@ -66,11 +71,23 @@ const findItemsInCollection = async (collectionId: string, itemId = "") => {
             as: 'items'
         }
     }, {
-        $match: {
-            _id: new Types.ObjectId(collectionId),
+        $lookup: {
+            from: 'users',
+            localField: 'idUser',
+            foreignField: '_id',
+            as: 'users'
+        }
+    }, {
+        $unwind: {
+            path: '$users'
+        }
+    }, {
+        $project: {
+            'users.password': 0
         }
     }])
 }
+
 const createCollection = async (data: Icollection) => {
     try {
         const collection = constructCollection(data)
@@ -82,13 +99,19 @@ const createCollection = async (data: Icollection) => {
 }
 
 const updateCollection = async (collectionId: string, data: Icollection) => {
-    const result = await CollectionModel.updateOne({ _id: collectionId }, { $set: data })
+    return await CollectionModel.updateOne({ _id: collectionId }, { $set: data })
 }
 
 const deleteCollection = async (collectionId: string) => {
-    const result = await CollectionModel.deleteOne({ _id: collectionId })
+    return await CollectionModel.deleteOne({ _id: collectionId })
+}
+
+const deleteUserCollectionAndItems = async (userId: string, type = "") => {
+    const collectionIdList = await findCollection(userId, { _id: 1 })
+    await item.deleteManyItems({ collectionId: { $in: collectionIdList } })
+    return await CollectionModel.deleteMany({ _id: { $in: collectionIdList } })
 }
 
 
-export default { constructCollection, findCollection, findItemsInCollection, createCollection, updateCollection, deleteCollection, largestCollection }
+export default { constructCollection, findCollection, findItemsInCollection, createCollection, updateCollection, deleteCollection, largestCollection, deleteUserCollectionAndItems }
 
