@@ -20,8 +20,8 @@ const options: cors.CorsOptions = {
     origin: allowedOrigins,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true,
-    // preflightContinue: true,
-    // optionsSuccessStatus: 200
+    preflightContinue: true,
+    optionsSuccessStatus: 200
 }
 
 app.use(cors(options))
@@ -47,7 +47,7 @@ app.use(session({
     resave: false,
     saveUninitialized: true,
     cookie: {
-        secure: process.env.NODE_ENV !== 'development',
+        secure: process.env.NODE_ENV === 'development',
         sameSite: process.env.NODE_ENV === 'development' ? 'lax' : 'none',
         maxAge: timeout.experssSession()
     },
