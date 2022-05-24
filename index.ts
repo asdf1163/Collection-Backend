@@ -47,8 +47,8 @@ app.use(session({
     resave: false,
     saveUninitialized: true,
     cookie: {
-        secure: process.env.NODE_ENV === 'development',
-        sameSite: process.env.NODE_ENV === 'development' ? 'lax' : 'none',
+        secure: true,
+        sameSite: 'none',
         maxAge: timeout.experssSession()
     },
 }))
