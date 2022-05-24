@@ -20,8 +20,6 @@ const options: cors.CorsOptions = {
     origin: allowedOrigins,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true,
-    preflightContinue: true,
-    optionsSuccessStatus: 200
 }
 
 app.use(cors(options))
