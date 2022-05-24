@@ -20,7 +20,7 @@ const options: cors.CorsOptions = {
     origin: allowedOrigins,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true,
-    // preflightContinue: true,
+    preflightContinue: true,
     optionsSuccessStatus: 200
 }
 
